@@ -1,8 +1,8 @@
 '''
 author: 0x404
 Date: 2021-10-13 21:12:59
-LastEditTime: 2021-10-13 21:56:05
-Description: 最长匹配算法
+LastEditTime: 2021-10-13 22:02:48
+Description: 最长匹配算法，分别实现正向最长匹配、逆向最长匹配、双向最长匹配
 '''
 import tools.trieTree as trieTree
 
