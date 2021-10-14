@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-13 21:12:59
-LastEditTime: 2021-10-13 22:02:48
+LastEditTime: 2021-10-14 10:36:08
 Description: 最长匹配算法，分别实现正向最长匹配、逆向最长匹配、双向最长匹配
 '''
 import tools.trieTree as trieTree
@@ -73,7 +73,6 @@ def BMM(sentence, dic):
     else:
         counterFMM = sum(1 for w in resFMM if len(w) == 1)
         counterRMM = sum(1 for w in resRMM if len(w) == 1)
-        print (counterFMM, counterRMM)
         if counterFMM < counterRMM:
             return resFMM
         else:
