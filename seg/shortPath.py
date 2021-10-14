@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-14 09:44:58
-LastEditTime: 2021-10-14 10:49:05
+LastEditTime: 2021-10-14 11:00:09
 Description: 
 '''
 
@@ -41,12 +41,14 @@ class Net():
         :param dic: 参考的词典
         :return: void
         """
-        self.v = [Node(i) for i in range(len(text) + 1)]
-        self.v[0].minDis = 0
-        self.text = text
-        self.trie = trieTree.Trie(dic)
-        self.maxLen = max(len(w) for w in dic)
-        self.__build()
+        self.text = text    # 待分词的句子
+        self.trie = trieTree.Trie(dic)          # 根据词典建立的trie树
+        self.maxLen = max(len(w) for w in dic)  # 词典中单词的最长长度
+
+        self.v = [Node(i) for i in range(len(text) + 1)]    # 网络中节点集合
+        self.v[0].minDis = 0    # 初始化第一个点的距离
+
+        self.__build()  # 构建网络
 
     def __build(self):
         """构建网络"""
@@ -61,7 +63,8 @@ class Net():
 
         for i in range(len(self.v) - 1):
             self.v[i].add(self.v[i + 1])
-        self.__topsort()
+
+        self.__topsort() # 构建完成后通过按照拓扑序计算最短路径
 
     def __topsort(self):
         """拓扑排序"""
@@ -75,15 +78,14 @@ class Net():
     def getResult(self):
         """返回分词结果"""
         result = []
-        now = len(self.text)
+        now = len(self.text) # 从后往前，根据节点的前驱节点遍历
         
         while now > 0:
-            # print(now)
             prev = self.v[now].prev
             result.append(self.text[prev : now])
             now = prev
         
-        result.reverse()
+        result.reverse()    # 由于逆向遍历，需要对结果逆序处理
         return result
 
 def splitByShortPath(text, dic):
