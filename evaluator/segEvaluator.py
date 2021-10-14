@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-14 13:48:35
-LastEditTime: 2021-10-14 19:15:22
+LastEditTime: 2021-10-14 20:50:55
 Description: 
 '''
 
@@ -25,7 +25,7 @@ def evaluate(mode, path, n, dic):
     if mode not in ("FMM", "RMM", "BMM", "shortPath"):
         raise Exception("最长匹配算法：模式不存在")
     
-    testData, ansData = dataLoader.loadTestData(n, path)
+    testData, ansData = dataLoader.loadSegData(n, path)
     
     res = []
     if mode == "FMM":
@@ -36,8 +36,6 @@ def evaluate(mode, path, n, dic):
         res = MM.BMM(testData, dic)
     else:
         res = shortPath.splitByShortPath(testData, dic)
-
-    print (res)
 
     predData = []
     for item in res:

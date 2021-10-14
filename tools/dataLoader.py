@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-13 20:12:16
-LastEditTime: 2021-10-14 16:01:23
+LastEditTime: 2021-10-14 20:50:32
 Description: 
 '''
 import util.helper as helper
@@ -16,7 +16,7 @@ def loadDictionary(path):
     file.close()
     return wordList
 
-def loadTestData(n, path):
+def loadSegData(n, path):
     """
     加载测试集
     :param n: 测试集中的句子数
