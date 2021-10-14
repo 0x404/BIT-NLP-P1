@@ -1,17 +1,17 @@
 '''
 author: 0x404
 Date: 2021-10-13 21:12:59
-LastEditTime: 2021-10-14 10:36:08
+LastEditTime: 2021-10-14 14:27:00
 Description: 最长匹配算法，分别实现正向最长匹配、逆向最长匹配、双向最长匹配
 '''
 import tools.trieTree as trieTree
 
-def FMM(sentence, dic):
+def FMM(sentences, dic):
     """
     使用正向最长匹配进行分词
-    :param sentence: 待分词的句子
+    :param sentence: 待分词的句子列表
     :param dic: 参考的词典列表
-    :return: 返回分词结果的列表形式
+    :return: 返回分词结果的矩阵形式
     """
     maxLen = 0
     for word in dic:
@@ -20,23 +20,26 @@ def FMM(sentence, dic):
     result = []
     trie = trieTree.Trie(dic)   # 使用trie树优化算法时间复杂度
 
-    i = 0
-    while i < len(sentence):
-        pos = min(i + maxLen - 1, len(sentence) - 1)
-        while trie.isExist(sentence[i : pos + 1]) == False:
-            pos = pos - 1
-            if pos == i:
-                break
-        result.append(sentence[i : pos + 1])
-        i = pos + 1
+    for sentence in sentences:
+        i = 0
+        ans = []
+        while i < len(sentence):
+            pos = min(i + maxLen - 1, len(sentence) - 1)
+            while trie.isExist(sentence[i : pos + 1]) == False and pos > i:
+                pos = pos - 1
+                if pos == i:
+                    break
+            ans.append(sentence[i : pos + 1])
+            i = pos + 1
+        result.append(ans)
     return result
 
-def RMM(sentence, dic):
+def RMM(sentences, dic):
     """
     使用逆向最长匹配进行分词
-    :param sentence: 待分词的句子
+    :param sentence: 待分词的句子列表
     :param dic: 参考的词典列表
-    :return: 返回分词结果的列表形式
+    :return: 返回分词结果的矩阵形式
     """
     maxLen = 0
     for word in dic:
@@ -45,36 +48,42 @@ def RMM(sentence, dic):
     result = []
     trie = trieTree.Trie(dic)    # 使用trie树优化算法时间复杂度
 
-    i = len(sentence) - 1
-    while i >= 0:
-        pos = max(i - maxLen + 1, 0)
-        while trie.isExist(sentence[pos : i + 1]) == False:
-            pos = pos + 1
-            if pos == i:
-                break
-        result.append(sentence[pos : i + 1])
-        i = pos - 1
-    result.reverse()    # 逆向最长匹配的分词结果需要逆序
+    for sentence in sentences:
+        i = len(sentence) - 1
+        ans = []
+        while i >= 0:
+            pos = max(i - maxLen + 1, 0)
+            while trie.isExist(sentence[pos : i + 1]) == False and pos < i:
+                pos = pos + 1
+                if pos == i:
+                    break
+            ans.append(sentence[pos : i + 1])
+            i = pos - 1
+        ans.reverse()
+        result.append(ans)
     return result
 
-def BMM(sentence, dic):
+def BMM(sentences, dic):
     """
     使用双向最长匹配进行分词
-    :param sentence: 待分词的句子
+    :param sentence: 待分词的句子列表
     :param dic: 参考的词典列表
-    :return: 返回分词结果的列表形式
+    :return: 返回分词结果的矩阵形式
     """
-    resFMM = FMM(sentence, dic)
-    resRMM = RMM(sentence, dic)
-    if len(resFMM) < len(resRMM):
-        return resFMM
-    elif len(resRMM) < len(resFMM):
-        return resRMM
-    else:
-        counterFMM = sum(1 for w in resFMM if len(w) == 1)
-        counterRMM = sum(1 for w in resRMM if len(w) == 1)
-        if counterFMM < counterRMM:
-            return resFMM
+    result = []
+    for sentence in sentences:
+        resFMM = FMM([sentence], dic)[0]
+        resRMM = RMM([sentence], dic)[0]
+        if len(resFMM) < len(resRMM):
+            result.append(resFMM)
+        elif len(resRMM) < len(resFMM):
+            result.append(resRMM)
         else:
-            return resRMM
+            counterFMM = sum(1 for w in resFMM if len(w) == 1)
+            counterRMM = sum(1 for w in resRMM if len(w) == 1)
+            if counterFMM < counterRMM:
+                result.append(resFMM)
+            else:
+                result.append(resRMM)
+    return result
     
