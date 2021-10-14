@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-14 20:49:58
-LastEditTime: 2021-10-14 21:10:40
+LastEditTime: 2021-10-14 21:23:57
 Description: 
 '''
 
@@ -32,8 +32,12 @@ def processData(sourcePath, savePath):
         lineProcessed = lineProcessed[0 : len(lineProcessed) - 1] + '\n'
         save.writelines(lineProcessed)
 
-processData("..\\data\\199801-test.txt", "..\\data\\pos-processed\\199801-test.txt")
-processData("..\\data\\199801-train.txt", "..\\data\\pos-processed\\199801-train.txt")
-                
+
+def main():
+    processData("..\\data\\199801-test.txt", "..\\data\\pos-processed\\199801-test.txt")
+    processData("..\\data\\199801-train.txt", "..\\data\\pos-processed\\199801-train.txt")
+
+if __name__ == "__main__":
+    main()
                 
 
