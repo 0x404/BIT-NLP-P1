@@ -1,9 +1,10 @@
 '''
 author: 0x404
 Date: 2021-10-13 21:12:59
-LastEditTime: 2021-10-14 14:27:00
+LastEditTime: 2021-10-14 15:43:14
 Description: 最长匹配算法，分别实现正向最长匹配、逆向最长匹配、双向最长匹配
 '''
+import time
 import tools.trieTree as trieTree
 
 def FMM(sentences, dic):
@@ -71,9 +72,11 @@ def BMM(sentences, dic):
     :return: 返回分词结果的矩阵形式
     """
     result = []
-    for sentence in sentences:
-        resFMM = FMM([sentence], dic)[0]
-        resRMM = RMM([sentence], dic)[0]
+    resFMMSet = FMM(sentences, dic)
+    resRMMSet = RMM(sentences, dic)
+    for i in range(len(sentences)):
+        resFMM = resFMMSet[i]
+        resRMM = resRMMSet[i]
         if len(resFMM) < len(resRMM):
             result.append(resFMM)
         elif len(resRMM) < len(resFMM):
