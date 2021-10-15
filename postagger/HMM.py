@@ -1,10 +1,10 @@
 '''
 author: 0x404
 Date: 2021-10-14 21:35:37
-LastEditTime: 2021-10-15 16:31:30
+LastEditTime: 2021-10-15 16:56:35
 Description: 
 '''
-# from tools import dataLoader as dataLoader
+# import tools.dataLoader as dataLoader
 import numpy as np
 import algorithm
 
@@ -65,10 +65,10 @@ def normalize(matrix):
         tot = sum(cnt for cnt in matrix[i])
         for j in range(len(matrix[i])):
             if matrix[i][j] == 0:
-                matrix[i][j] = float('-INF')
+                matrix[i][j] = float('-INF')            # 如果概率为0，取对数后为负无穷
             else:
                 matrix[i][j] = matrix[i][j] / tot
-                matrix[i][j] = np.log(matrix[i][j])
+                matrix[i][j] = np.log(matrix[i][j])     # 否则归一化后取对数
     return matrix
     
 def generateBegin(samples, tagID):
@@ -139,13 +139,14 @@ def generateEmit(samples, tagID):
 
 
 def main():
+    s = input()
     samples = loadPosData(50000, "..\\data\\pos-processed\\199801-train.txt")
     tagID, idTag = generateTagMap("file", "..\\data\\pos-processed\\tagSet.txt")
     
     begin = generateBegin(samples, tagID)
     trans = generateTrans(samples, tagID)
     emit = generateEmit(samples, tagID)
-    res = algorithm.viterbi(["他", "的", "希望", "是", "去", "希望", "小学"], begin, trans, emit, tagID, idTag)
+    res = algorithm.viterbi(["寂静", "如", "雾", "缓缓", "漫", "开"], begin, trans, emit, tagID, idTag)
     print (res)
 
     # print (posData)
