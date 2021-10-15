@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-14 21:35:37
-LastEditTime: 2021-10-15 16:56:35
+LastEditTime: 2021-10-15 17:25:18
 Description: 
 '''
 # import tools.dataLoader as dataLoader
@@ -139,14 +139,13 @@ def generateEmit(samples, tagID):
 
 
 def main():
-    s = input()
     samples = loadPosData(50000, "..\\data\\pos-processed\\199801-train.txt")
     tagID, idTag = generateTagMap("file", "..\\data\\pos-processed\\tagSet.txt")
     
     begin = generateBegin(samples, tagID)
     trans = generateTrans(samples, tagID)
     emit = generateEmit(samples, tagID)
-    res = algorithm.viterbi(["寂静", "如", "雾", "缓缓", "漫", "开"], begin, trans, emit, tagID, idTag)
+    res = algorithm.viterbi(["我", "爱", "北京", "天安门"], begin, trans, emit, tagID, idTag)
     print (res)
 
     # print (posData)
