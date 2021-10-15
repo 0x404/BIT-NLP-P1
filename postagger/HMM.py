@@ -1,11 +1,12 @@
 '''
 author: 0x404
 Date: 2021-10-14 21:35:37
-LastEditTime: 2021-10-15 14:54:26
+LastEditTime: 2021-10-15 16:31:30
 Description: 
 '''
 # from tools import dataLoader as dataLoader
 import numpy as np
+import algorithm
 
 def loadPosData(n, path):
     """
@@ -118,7 +119,7 @@ def generateEmit(samples, tagID):
             text = data["text"]
             tag = data["tag"]
             if text not in emit[tagID[tag]].keys():
-                emit[tagID[tag]][text] = 0
+                emit[tagID[tag]][text] = 1
             else:
                 emit[tagID[tag]][text] += 1
     
@@ -138,13 +139,15 @@ def generateEmit(samples, tagID):
 
 
 def main():
-    samples = loadPosData(1950, "..\\data\\pos-processed\\199801-test.txt")
+    samples = loadPosData(50000, "..\\data\\pos-processed\\199801-train.txt")
     tagID, idTag = generateTagMap("file", "..\\data\\pos-processed\\tagSet.txt")
-    # print (idTag)
+    
     begin = generateBegin(samples, tagID)
     trans = generateTrans(samples, tagID)
     emit = generateEmit(samples, tagID)
-    print (emit)
+    res = algorithm.viterbi(["他", "的", "希望", "是", "去", "希望", "小学"], begin, trans, emit, tagID, idTag)
+    print (res)
+
     # print (posData)
 
 if __name__ == "__main__":
