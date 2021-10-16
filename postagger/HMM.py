@@ -1,14 +1,15 @@
 '''
 author: 0x404
 Date: 2021-10-14 21:35:37
-LastEditTime: 2021-10-16 12:45:48
+LastEditTime: 2021-10-16 16:05:10
 Description: 
 '''
 # import tools.dataLoader as dataLoader
 import numpy as np
 import pickle
 import os
-import algorithm
+import time
+import algorithm as algorithm
 
 def loadPosData(path, n = 1000000):
     """
@@ -140,22 +141,24 @@ def generateEmit(samples, tagID):
     return emit
 
 
-def tag(sentences, saveModel = False, useModel = False):
+def tag(sentences, saveModel = False, useModel = False, progressBar = False):
     """
     使用HMM对输入进行词性标注（默认训练后进行词性标注）
     :param sentences: 待标注向量或矩阵[[sentence1], [sentence2], ... ]   sentence = [[word1], [word2], ... ]
     :param saveModel: 将训练的模型保存到本地
     :param useModel:  不进行训练，使用本地保存的模型进行词性标注
+    :param progressBar: 显示当前标注进度
     :return: 词性标注后的结果矩阵[[sentence1], [sentence2], ... ]   sentence = [[word1/tag1], [word2/tag2], ... ]
     """
+
     if isinstance(sentences[0], str):   # 如果输入为一维向量，转成一个矩阵处理
         sentences = [sentences]
     model = {}
     if useModel:    
-        if os.path.exists("posTagerModelHMM.pkl") == False:
+        if os.path.exists("D:\\School\\大三\\自然语言处理\\作业\\Project1\\postagger\\posTagerModelHMM.pkl") == False:
             raise Exception("tag: 模型不存在，无法加载！")
 
-        file = open("posTagerModelHMM.pkl", mode="rb")
+        file = open("D:\\School\\大三\\自然语言处理\\作业\\Project1\\postagger\\posTagerModelHMM.pkl", mode="rb")
         model = pickle.load(file)
         file.close()
     else:
@@ -169,8 +172,30 @@ def tag(sentences, saveModel = False, useModel = False):
         model = {"begin" : begin, "trans" : trans, "emit" : emit, "tagId" : tagId, "idTag" : idTag}
     
     tagResult = []
-    for sentence in sentences:
-        tagResult.append(algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"]))
+
+    if progressBar:     # 显示进度条以及计算时间
+        print ("开始标注".center(58, "-"))
+        caseSum = len(sentences)
+        counter = 0
+        Len = 50
+        startTime = time.perf_counter()
+        for sentence in sentences:
+            counter += 1
+            tagResult.append(algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"]))
+            finished = int(counter * Len / caseSum)
+            a = "*" * finished
+            b = "." * (Len - finished)
+            c = (finished / Len) * 100
+            curTime = time.perf_counter() - startTime
+            if counter == caseSum:
+                print ("\r{:^3.0f}%[{}->{}]{:.2f}s".format(c, a, b, curTime))
+            else:
+                print ("\r{:^3.0f}%[{}->{}]{:.2f}s".format(c, a, b, curTime), end="")
+
+        print ("标注完成".center(58, "-"))
+    else:
+        for sentence in sentences:
+            tagResult.append(algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"]))
     
     if saveModel:
         file = open("posTagerModelHMM.pkl", mode="wb")
@@ -182,12 +207,8 @@ def tag(sentences, saveModel = False, useModel = False):
 
 def main():
     
-    res = tag(["我", "爱", "北京", "天安门"], useModel=True)
+    res = tag(["当前", "，", "康姝元元", "最最最最", "可爱"], useModel=True, progressBar=True)
     print (res)
-    # res = algorithm.viterbi(["我", "爱", "北京", "天安门"], begin, trans, emit, tagID, idTag)
-    # print (res)
-
-    # print (posData)
 
 if __name__ == "__main__":
     main()

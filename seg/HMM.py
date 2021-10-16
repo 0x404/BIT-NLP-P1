@@ -1,11 +1,12 @@
 '''
 author: 0x404
 Date: 2021-10-15 19:57:42
-LastEditTime: 2021-10-16 12:45:56
+LastEditTime: 2021-10-16 16:12:37
 Description: 
 '''
 
 import os
+import time
 import pickle
 import numpy as np
 import algorithm
@@ -139,7 +140,7 @@ def decoder(input):
             now = ""
     return result
 
-def cut(sentences, saveModel = False, useModel = False):
+def cut(sentences, saveModel = False, useModel = False, progressBar = False):
     """
     使用HMM对输入进行分词（默认进行训练后分词）
     :param sentences: 待分词向量或矩阵[[sentence1], [sentence2], ... ]
@@ -167,9 +168,30 @@ def cut(sentences, saveModel = False, useModel = False):
         model = {"begin" : begin, "trans" : trans, "emit" : emit, "tagId" : tagId, "idTag" : idTag}
     
     cutResult = []
-    for sentence in sentences:
-        viterbiResult = algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"])
-        cutResult.append(decoder(viterbiResult))
+    if progressBar:     # 显示进度条以及计算时间
+        print ("开始分词".center(58, "-"))
+        caseSum = len(sentences)
+        counter = 0
+        Len = 50
+        startTime = time.perf_counter()
+        for sentence in sentences:
+            counter += 1
+            viterbiResult = algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"])
+            cutResult.append(decoder(viterbiResult))
+            finished = int(counter * Len / caseSum)
+            a = "*" * finished
+            b = "." * (Len - finished)
+            c = (finished / Len) * 100
+            curTime = time.perf_counter() - startTime
+            if counter == caseSum:
+                print ("\r{:^3.0f}%[{}->{}]{:.2f}s".format(c, a, b, curTime))
+            else:
+                print ("\r{:^3.0f}%[{}->{}]{:.2f}s".format(c, a, b, curTime), end="")
+        print ("分词完成".center(58, "-"))
+    else:
+        for sentence in sentences:
+            viterbiResult = algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"])
+            cutResult.append(decoder(viterbiResult))
     
     if saveModel:
         file = open("wordSegmentMoelHMM.pkl", mode="wb")
@@ -179,7 +201,7 @@ def cut(sentences, saveModel = False, useModel = False):
 
 
 def main():
-    res = cut(["康姝元元最可爱了", "难道不是吗"], useModel=True)
+    res = cut("曾群鸿有两个角", useModel=True, progressBar=False)
     print (res)
 if __name__ == "__main__":
     main()
