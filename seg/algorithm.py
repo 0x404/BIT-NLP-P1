@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-15 15:14:01
-LastEditTime: 2021-10-15 22:58:54
+LastEditTime: 2021-10-16 16:05:43
 Description: 
 '''
 
@@ -25,7 +25,7 @@ def viterbi(observation, begin, trans, emit, tagId, idTag):
         if observation[0] in emit[i].keys():
             dp[0][i] = begin[i] + emit[i][observation[0]]
         else:
-            dp[0][i] = begin[i] + float('-INF')     # 如果状态i到第一个词的发射概率为0，则记为负无穷
+            dp[0][i] = begin[i] + float('-10000')     # 如果状态i到第一个词的发射概率为0，则记为负无穷
     
     for i in range(t - 1):
         pre, now = i, i + 1
@@ -38,7 +38,7 @@ def viterbi(observation, begin, trans, emit, tagId, idTag):
 
                 prob = 0    # 计算转移概率
                 if observation[now] not in emit[nowS].keys():
-                    prob = dp[pre & 1][preS] + trans[preS][nowS] + float('-INF')
+                    prob = dp[pre & 1][preS] + trans[preS][nowS] + float('-10000')
                 else:
                     prob = dp[pre & 1][preS] + trans[preS][nowS] + emit[nowS][observation[now]]
 
