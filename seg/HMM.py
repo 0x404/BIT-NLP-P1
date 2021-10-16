@@ -1,11 +1,12 @@
 '''
 author: 0x404
 Date: 2021-10-15 19:57:42
-LastEditTime: 2021-10-15 23:12:44
+LastEditTime: 2021-10-16 12:45:56
 Description: 
 '''
 
-from typing import Text
+import os
+import pickle
 import numpy as np
 import algorithm
 
@@ -138,18 +139,47 @@ def decoder(input):
             now = ""
     return result
 
+def cut(sentences, saveModel = False, useModel = False):
+    """
+    使用HMM对输入进行分词（默认进行训练后分词）
+    :param sentences: 待分词向量或矩阵[[sentence1], [sentence2], ... ]
+    :param saveModel: 将训练的模型保存到本地
+    :param useModel:  不进行训练，使用本地保存的模型进行分词
+    :return: 分词后的结果矩阵[[sentence1], [sentence2], ... ]   sentence = [[word1], [word2], ... ]
+    """
+    if isinstance(sentences, str):  # 如果输入为一个一维向量，转成矩阵形式
+        sentences = [sentences]
+    model = {}
+    if useModel:
+        if os.path.exists("wordSegmentMoelHMM.pkl") == False:
+            raise Exception("cut: 模型不存在，无法加载！")
+        file = open("wordSegmentMoelHMM.pkl", mode="rb")
+        model = pickle.load(file)
+        file.close()
+    else:
+        samples = loadHMMSegData("..\\data\\seg-processed\\msr_train.txt")
+        tagId, idTag = generateTagMap()
+
+        begin = generateBegin(samples, tagId)
+        trans = generateTrans(samples, tagId)
+        emit = generateEmit(samples, tagId)
+
+        model = {"begin" : begin, "trans" : trans, "emit" : emit, "tagId" : tagId, "idTag" : idTag}
+    
+    cutResult = []
+    for sentence in sentences:
+        viterbiResult = algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"])
+        cutResult.append(decoder(viterbiResult))
+    
+    if saveModel:
+        file = open("wordSegmentMoelHMM.pkl", mode="wb")
+        pickle.dump(model, file)
+        file.close()
+    return cutResult
 
 
 def main():
-    tagId, idTag = generateTagMap()
-    samples = loadHMMSegData("..\\data\\seg-processed\\msr_train.txt")
-    begin = generateBegin(samples, tagId)
-    trans = generateTrans(samples, tagId)
-    emit = generateEmit(samples, tagId)
-    res = algorithm.viterbi("我喜欢你", begin, trans, emit, tagId, idTag)
+    res = cut(["康姝元元最可爱了", "难道不是吗"], useModel=True)
     print (res)
-    decode = decoder(res)
-    print (decode)
-
 if __name__ == "__main__":
     main()

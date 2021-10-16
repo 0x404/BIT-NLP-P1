@@ -1,14 +1,16 @@
 '''
 author: 0x404
 Date: 2021-10-14 21:35:37
-LastEditTime: 2021-10-15 17:25:18
+LastEditTime: 2021-10-16 12:45:48
 Description: 
 '''
 # import tools.dataLoader as dataLoader
 import numpy as np
+import pickle
+import os
 import algorithm
 
-def loadPosData(n, path):
+def loadPosData(path, n = 1000000):
     """
     加载词性标注数据集
     :param n: 加载的句子数
@@ -138,15 +140,52 @@ def generateEmit(samples, tagID):
     return emit
 
 
-def main():
-    samples = loadPosData(50000, "..\\data\\pos-processed\\199801-train.txt")
-    tagID, idTag = generateTagMap("file", "..\\data\\pos-processed\\tagSet.txt")
+def tag(sentences, saveModel = False, useModel = False):
+    """
+    使用HMM对输入进行词性标注（默认训练后进行词性标注）
+    :param sentences: 待标注向量或矩阵[[sentence1], [sentence2], ... ]   sentence = [[word1], [word2], ... ]
+    :param saveModel: 将训练的模型保存到本地
+    :param useModel:  不进行训练，使用本地保存的模型进行词性标注
+    :return: 词性标注后的结果矩阵[[sentence1], [sentence2], ... ]   sentence = [[word1/tag1], [word2/tag2], ... ]
+    """
+    if isinstance(sentences[0], str):   # 如果输入为一维向量，转成一个矩阵处理
+        sentences = [sentences]
+    model = {}
+    if useModel:    
+        if os.path.exists("posTagerModelHMM.pkl") == False:
+            raise Exception("tag: 模型不存在，无法加载！")
+
+        file = open("posTagerModelHMM.pkl", mode="rb")
+        model = pickle.load(file)
+        file.close()
+    else:
+        samples = loadPosData("..\\data\\pos-processed\\199801-train.txt")
+        tagId, idTag = generateTagMap("file", "..\\data\\pos-processed\\tagSet.txt")
+
+        begin = generateBegin(samples, tagId)
+        trans = generateTrans(samples, tagId)
+        emit = generateEmit(samples, tagId)
+
+        model = {"begin" : begin, "trans" : trans, "emit" : emit, "tagId" : tagId, "idTag" : idTag}
     
-    begin = generateBegin(samples, tagID)
-    trans = generateTrans(samples, tagID)
-    emit = generateEmit(samples, tagID)
-    res = algorithm.viterbi(["我", "爱", "北京", "天安门"], begin, trans, emit, tagID, idTag)
+    tagResult = []
+    for sentence in sentences:
+        tagResult.append(algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"]))
+    
+    if saveModel:
+        file = open("posTagerModelHMM.pkl", mode="wb")
+        pickle.dump(model, file)
+        file.close()
+
+    return tagResult
+
+
+def main():
+    
+    res = tag(["我", "爱", "北京", "天安门"], useModel=True)
     print (res)
+    # res = algorithm.viterbi(["我", "爱", "北京", "天安门"], begin, trans, emit, tagID, idTag)
+    # print (res)
 
     # print (posData)
 
