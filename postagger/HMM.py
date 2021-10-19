@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-14 21:35:37
-LastEditTime: 2021-10-19 12:42:52
+LastEditTime: 2021-10-19 14:07:39
 Description: 
 '''
 # import tools.dataLoader as dataLoader
@@ -198,7 +198,7 @@ def tag(sentences, saveModel = False, useModel = False, progressBar = False):
             tagResult.append(algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"]))
     
     if saveModel:
-        file = open("posTagerModelHMM.pkl", mode="wb")
+        file = open("postagger\\posTagerModelHMM.pkl", mode="wb")
         pickle.dump(model, file)
         file.close()
 
