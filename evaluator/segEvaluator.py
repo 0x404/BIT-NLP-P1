@@ -1,20 +1,21 @@
 '''
 author: 0x404
 Date: 2021-10-14 13:48:35
-LastEditTime: 2021-10-14 20:50:55
+LastEditTime: 2021-10-19 13:57:46
 Description: 
 '''
 
 import time
 import tools.dataLoader as dataLoader
 import seg.MM as MM
+import seg.HMM as HMM
 import seg.shortPath as shortPath
 import util.helper as helper
 
 def evaluate(mode, path, n, dic):
     """
     评测MM算法
-    :param mode: 使用的算法(FMM, RMM, BMM, shortPath)
+    :param mode: 使用的算法(FMM, RMM, BMM, HMM, shortPath)
     :param path: 测试集路径
     :param n: 选择测试集前n条进行测试
     :param dic: 参考的字典
@@ -22,13 +23,15 @@ def evaluate(mode, path, n, dic):
     """
     startTime = time.time() # 计时器
 
-    if mode not in ("FMM", "RMM", "BMM", "shortPath"):
+    if mode not in ("FMM", "RMM", "BMM", "HMM", "shortPath"):
         raise Exception("最长匹配算法：模式不存在")
     
     testData, ansData = dataLoader.loadSegData(n, path)
     
     res = []
-    if mode == "FMM":
+    if mode == "HMM":
+        res = HMM.cut(testData, progressBar=True)
+    elif mode == "FMM":
         res = MM.FMM(testData, dic)
     elif mode == "RMM":
         res = MM.RMM(testData, dic)
