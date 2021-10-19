@@ -1,12 +1,14 @@
 '''
 author: 0x404
 Date: 2021-10-16 18:41:14
-LastEditTime: 2021-10-16 19:59:34
+LastEditTime: 2021-10-19 13:00:43
 Description: 
 '''
-
+import os
+import pickle
+import time
 import numpy as np
-import algorithm
+import ner.algorithm as algorithm
 
 def loadHMMNERData(path, n = 100000):
     """
@@ -143,14 +145,83 @@ def decoder(input):
             continue
         elif tag in ("B_nr", "B_nt", "B_ns"):
             now = ""
-            while input[i][1][0] != "E":
+            while i < len(input) and input[i][1][0] != "E":
                 now += input[i][0]
                 i += 1
-            now += input[i][0]
+            if i < len(input):
+                now += input[i][0]
+            if i == len(input):
+                i -= 1
             result[f[input[i][1][2:]]].append(now)
         i += 1
     return result[0], result[1], result[2]
 
+def ner(sentences, saveModel = False, useModel = False, progressBar = False):
+    """
+    使用HMM对输入进行命名实体识别（默认训练后进行实体识别）
+    :param sentences: 待识别向量或矩阵[[sentence1], [sentence2], ... ]   sentence = [[word1], [word2], ... ]
+    :param saveModel: 将训练的模型保存到本地
+    :param useModel:  不进行训练，使用本地保存的模型进行词性命名实体识别
+    :param progressBar: 显示当前标注进度
+    :return: 结果矩阵[[result1], [result2], ... ]   result = {"location" : [], "people" : [], "organization" : []}
+    """
+
+    if isinstance(sentences[0], str):   # 如果输入为一维向量，转成一个矩阵处理
+        sentences = [sentences]
+    model = {}
+    if useModel:    
+        if os.path.exists("D:\\School\\大三\\自然语言处理\\作业\\Project1\\ner\\nerModelHMM.pkl") == False:
+            raise Exception("tag: 模型不存在，无法加载！")
+
+        file = open("D:\\School\\大三\\自然语言处理\\作业\\Project1\\ner\\nerModelHMM.pkl", mode="rb")
+        model = pickle.load(file)
+        file.close()
+    else:
+        samples = loadHMMNERData("data\\ner-processed\\199801-train.txt")
+        tagId, idTag = generateTagMap()
+
+        begin = generateBegin(samples, tagId)
+        trans = generateTrans(samples, tagId)
+        emit = generateEmit(samples, tagId)
+
+        model = {"begin" : begin, "trans" : trans, "emit" : emit, "tagId" : tagId, "idTag" : idTag}
+    
+    nerResult = []
+
+    if progressBar:     # 显示进度条以及计算时间
+        print ("开始识别".center(58, "-"))
+        caseSum = len(sentences)
+        counter = 0
+        Len = 50
+        startTime = time.perf_counter()
+        for sentence in sentences:
+            counter += 1
+            viterbiResult = algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"])
+            people, location, organization = decoder(viterbiResult)
+            nerResult.append({"people" : people, "location" : location, "organization" : organization})
+            finished = int(counter * Len / caseSum)
+            a = "*" * finished
+            b = "." * (Len - finished)
+            c = (finished / Len) * 100
+            curTime = time.perf_counter() - startTime
+            if counter == caseSum:
+                print ("\r{:^3.0f}%[{}->{}]{:.2f}s".format(c, a, b, curTime))
+            else:
+                print ("\r{:^3.0f}%[{}->{}]{:.2f}s".format(c, a, b, curTime), end="")
+
+        print ("识别完成".center(58, "-"))
+    else:
+        for sentence in sentences:
+            viterbiResult = algorithm.viterbi(sentence, model["begin"], model["trans"], model["emit"], model["tagId"], model["idTag"])
+            people, location, organization = decoder(viterbiResult)
+            nerResult.append({"people" : people, "location" : location, "organization" : organization})
+    
+    if saveModel:
+        file = open("ner\\nerModelHMM.pkl", mode="wb")
+        pickle.dump(model, file)
+        file.close()
+
+    return nerResult
 
 if __name__ == "__main__":
     samples = loadHMMNERData("..\\data\\ner-processed\\199801-train.txt")

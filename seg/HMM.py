@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-15 19:57:42
-LastEditTime: 2021-10-16 16:12:37
+LastEditTime: 2021-10-19 12:33:07
 Description: 
 '''
 
@@ -9,7 +9,7 @@ import os
 import time
 import pickle
 import numpy as np
-import algorithm
+import seg.algorithm as algorithm
 
 def loadHMMSegData(path, n = 100000):
     """
@@ -61,7 +61,6 @@ def generateBegin(samples, tagID):
     for sample in samples:
         start = sample[0]
         begin[tagID[start["tag"]]] += 1
-        
     begin = normalize([begin])[0]
     return begin
 
@@ -81,7 +80,6 @@ def generateTrans(samples, tagID):
             now = sample[j]
             trans[tagID[prev["tag"]]][tagID[now["tag"]]] += 1
             prev = now
-    
     trans = normalize(trans)
     return trans
 
@@ -152,13 +150,13 @@ def cut(sentences, saveModel = False, useModel = False, progressBar = False):
         sentences = [sentences]
     model = {}
     if useModel:
-        if os.path.exists("wordSegmentMoelHMM.pkl") == False:
+        if os.path.exists("seg\\wordSegmentMoelHMM.pkl") == False:
             raise Exception("cut: 模型不存在，无法加载！")
-        file = open("wordSegmentMoelHMM.pkl", mode="rb")
+        file = open("seg\\wordSegmentMoelHMM.pkl", mode="rb")
         model = pickle.load(file)
         file.close()
     else:
-        samples = loadHMMSegData("..\\data\\seg-processed\\msr_train.txt")
+        samples = loadHMMSegData("data\\seg-processed\\msr_train.txt")
         tagId, idTag = generateTagMap()
 
         begin = generateBegin(samples, tagId)
@@ -194,14 +192,14 @@ def cut(sentences, saveModel = False, useModel = False, progressBar = False):
             cutResult.append(decoder(viterbiResult))
     
     if saveModel:
-        file = open("wordSegmentMoelHMM.pkl", mode="wb")
+        file = open("seg\\wordSegmentMoelHMM.pkl", mode="wb")
         pickle.dump(model, file)
         file.close()
     return cutResult
 
 
 def main():
-    res = cut("曾群鸿有两个角", useModel=True, progressBar=False)
+    res = cut("思考一下这篇文章的大意", useModel=False)
     print (res)
 if __name__ == "__main__":
     main()

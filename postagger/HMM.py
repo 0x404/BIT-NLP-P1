@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-14 21:35:37
-LastEditTime: 2021-10-16 16:05:10
+LastEditTime: 2021-10-19 12:42:52
 Description: 
 '''
 # import tools.dataLoader as dataLoader
@@ -9,7 +9,7 @@ import numpy as np
 import pickle
 import os
 import time
-import algorithm as algorithm
+import postagger.algorithm as algorithm
 
 def loadPosData(path, n = 1000000):
     """
@@ -162,8 +162,8 @@ def tag(sentences, saveModel = False, useModel = False, progressBar = False):
         model = pickle.load(file)
         file.close()
     else:
-        samples = loadPosData("..\\data\\pos-processed\\199801-train.txt")
-        tagId, idTag = generateTagMap("file", "..\\data\\pos-processed\\tagSet.txt")
+        samples = loadPosData("data\\pos-processed\\199801-train.txt")
+        tagId, idTag = generateTagMap("file", "data\\pos-processed\\tagSet.txt")
 
         begin = generateBegin(samples, tagId)
         trans = generateTrans(samples, tagId)
@@ -207,7 +207,7 @@ def tag(sentences, saveModel = False, useModel = False, progressBar = False):
 
 def main():
     
-    res = tag(["当前", "，", "康姝元元", "最最最最", "可爱"], useModel=True, progressBar=True)
+    res = tag(["思考", "一下", "这", "篇", "文章", "的", "大意"], useModel=True, progressBar=True)
     print (res)
 
 if __name__ == "__main__":
