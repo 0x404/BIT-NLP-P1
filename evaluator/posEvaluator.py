@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-16 14:18:32
-LastEditTime: 2021-10-16 15:56:26
+LastEditTime: 2021-11-04 20:41:28
 Description: 
 '''
 
@@ -15,7 +15,7 @@ def evaluate(n = 5000):
     :return: precision, recall, f1-socre
     """
 
-    data = HMM.loadPosData("D:\\School\\大三\\自然语言处理\\作业\\Project1\\data\\pos-processed\\199801-test.txt")
+    data = HMM.loadPosData("data\\pos-processed\\199801-test.txt")
 
     # 将加载的数据集分为待标注序列和标签答案序列
     testData, ansTag = [], []

@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-14 21:35:37
-LastEditTime: 2021-10-19 14:07:39
+LastEditTime: 2021-11-04 20:43:06
 Description: 
 '''
 # import tools.dataLoader as dataLoader
@@ -155,10 +155,10 @@ def tag(sentences, saveModel = False, useModel = False, progressBar = False):
         sentences = [sentences]
     model = {}
     if useModel:    
-        if os.path.exists("D:\\School\\大三\\自然语言处理\\作业\\Project1\\postagger\\posTagerModelHMM.pkl") == False:
+        if os.path.exists("postagger\\posTagerModelHMM.pkl") == False:
             raise Exception("tag: 模型不存在，无法加载！")
 
-        file = open("D:\\School\\大三\\自然语言处理\\作业\\Project1\\postagger\\posTagerModelHMM.pkl", mode="rb")
+        file = open("postagger\\posTagerModelHMM.pkl", mode="rb")
         model = pickle.load(file)
         file.close()
     else:
@@ -172,6 +172,7 @@ def tag(sentences, saveModel = False, useModel = False, progressBar = False):
         model = {"begin" : begin, "trans" : trans, "emit" : emit, "tagId" : tagId, "idTag" : idTag}
     
     tagResult = []
+    
 
     if progressBar:     # 显示进度条以及计算时间
         print ("开始标注".center(58, "-"))

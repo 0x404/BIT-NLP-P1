@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-19 12:21:50
-LastEditTime: 2021-10-19 13:52:28
+LastEditTime: 2021-11-04 19:52:37
 Description: 
 '''
 
@@ -12,6 +12,7 @@ import postagger.HMM as posHMM
 import ner.HMM as nerHMM
 import evaluator.posEvaluator as posEvaluator
 import evaluator.segEvaluator as segEvaluator
+import evaluator.nerEvaluator as nerEvaluator
 import tools.dataLoader as dataLoader
 
 def cut(sentences, HMM = False, FMM = False, RMM = False, BMM = False, shortPath = False, progressBar = False, useModel = False):
@@ -91,6 +92,16 @@ def evaluateTag(caseCount = 2000, HMM = True):
     precision, recall, f1 = posEvaluator.evaluate(caseCount)
     return precision, recall, f1
 
+def evaluateNer(caseCount = 100000, HMM = True):
+    """
+    评测命名实体识别算法
+    :param caseCount: 评测测试集中的前caseCount句，默认全部评测
+    :HMM: 评测HMM算法表现（当前仅支持HMM）
+    :return: precision, recall, f1-socre
+    """
+    precision, recall, f1 = nerEvaluator.evaluate(caseCount)
+    return precision, recall, f1
+
 def evaluateCut(caseCount = 100000, HMM = False, BMM = False, RMM = False, FMM = False, shortPath = False):
     """
     评测分词算法
@@ -117,4 +128,4 @@ def evaluateCut(caseCount = 100000, HMM = False, BMM = False, RMM = False, FMM =
     if shortPath:
         precision, recall, f1 = segEvaluator.evaluate("shortPath", testDataPath, caseCount, dic)
     return precision, recall, f1
-    
+

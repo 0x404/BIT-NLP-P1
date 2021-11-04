@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-15 15:14:01
-LastEditTime: 2021-10-16 16:05:43
+LastEditTime: 2021-11-04 16:54:45
 Description: 
 '''
 
@@ -17,6 +17,7 @@ def viterbi(observation, begin, trans, emit, tagId, idTag):
     :return: 标注结果，如["寂静/a", "如/v", "雾/n", "缓缓/d", "漫/v", "开/v"]
     """
     t = len(observation)
+    if t == 0: return []
 
     dp = [[float('-INF') for i in range(len(tagId))] for _ in range(2)]     # dp[i][j]表示到第i层当前状态为j时的最大概率，考虑dp[i][j]仅与dp[i-1][k]有关，故使用滚动数组
     ls = [[-1 for i in range(len(tagId))] for _ in range(t)]                # ls[i][j]为当前再第i层，状态为j，上一步由i - 1的哪个状态转移而来

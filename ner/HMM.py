@@ -1,7 +1,7 @@
 '''
 author: 0x404
 Date: 2021-10-16 18:41:14
-LastEditTime: 2021-10-19 13:00:43
+LastEditTime: 2021-11-04 20:42:34
 Description: 
 '''
 import os
@@ -170,10 +170,10 @@ def ner(sentences, saveModel = False, useModel = False, progressBar = False):
         sentences = [sentences]
     model = {}
     if useModel:    
-        if os.path.exists("D:\\School\\大三\\自然语言处理\\作业\\Project1\\ner\\nerModelHMM.pkl") == False:
+        if os.path.exists("ner\\nerModelHMM.pkl") == False:
             raise Exception("tag: 模型不存在，无法加载！")
 
-        file = open("D:\\School\\大三\\自然语言处理\\作业\\Project1\\ner\\nerModelHMM.pkl", mode="rb")
+        file = open("ner\\nerModelHMM.pkl", mode="rb")
         model = pickle.load(file)
         file.close()
     else:
